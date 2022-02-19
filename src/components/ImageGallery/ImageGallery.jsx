@@ -20,5 +20,6 @@ const ImageGallery = ({ imgArr, setLargeUrl }) => {
 
 ImageGallery.propTypes = {
   imgArr: PropTypes.arrayOf(PropTypes.shape),
+  setLargeUrl: PropTypes.func,
 };
 export default ImageGallery;

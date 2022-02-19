@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Loader from './Loader/Loader';
 import Searchbar from './Searchbar/Searchbar';
 import PixabayApi from 'API/pixabayApi';
@@ -10,83 +10,55 @@ import Modal from './Modal/Modal';
 import styles from './styles.module.css';
 const pixabayApi = new PixabayApi();
 
-export class App extends React.Component {
-  state = {
-    imgArr: [],
-    searchInput: '',
-    isLoading: false,
-    showModal: false,
-    largeImage: '',
+export const App = () => {
+  const [imgArr, setImgArr] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImage, setLargeImage] = useState('');
+
+  const toggleLoading = () => {
+    setIsLoading(!isLoading);
   };
 
-  toggleLoader = () => {
-    this.setState({ isLoading: !this.state.isLoading });
+  const toggleShowModal = () => {
+    setShowModal(!showModal);
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  const setLargeUrl = url => {
+    setLargeImage(url);
+    toggleShowModal();
   };
 
-  setLargeUrl = url => {
-    this.setState({ largeImage: url });
-    this.toggleModal();
-  };
-
-  getImagesFromApi = () => {
-    pixabayApi.resetPage();
-    this.toggleLoader();
-    pixabayApi
-      .getImagesFromApi()
-      .then(hits => {
-        this.setState({ imgArr: [...hits] });
-        this.toggleLoader();
-      })
-      .catch(error => console.log(error));
-  };
-
-  loadMore = () => {
+  const loadMore = () => {
     pixabayApi.incrementPage();
-    this.toggleLoader();
+    toggleLoading();
     pixabayApi.getImagesFromApiByName().then(hits => {
-      this.setState({ imgArr: [...this.state.imgArr, ...hits] });
-      this.toggleLoader();
+      setImgArr([...imgArr, ...hits]);
+      toggleLoading();
     });
   };
 
-  onInputFormSubmit = query => {
+  const onInputFormSubmit = query => {
     if (query.trim() === '') {
       toast.error('введите значения для поиска');
       return;
     }
     pixabayApi.query = query;
-    this.toggleLoader();
+    toggleLoading();
     pixabayApi.getImagesFromApiByName().then(hits => {
-      this.setState({ imgArr: [...hits] });
-      this.toggleLoader();
+      setImgArr([...hits]);
+      toggleLoading();
     });
   };
 
-  render() {
-    const { showModal, isLoading } = this.state;
-    return (
-      <div className={styles.App}>
-        <Searchbar onFormSubmit={this.onInputFormSubmit} />
-        <ImageGallery
-          imgArr={this.state.imgArr}
-          setLargeUrl={this.setLargeUrl}
-        />
-        {this.state.imgArr.length !== 0 && <Button loadMore={this.loadMore} />}
-        {isLoading && <Loader />}
-        <ToastContainer autoClose={3000} />
-        {showModal && (
-          <Modal
-            onClose={this.toggleModal}
-            largeImage={this.state.largeImage}
-          />
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={styles.App}>
+      <Searchbar onFormSubmit={onInputFormSubmit} />
+      <ImageGallery imgArr={imgArr} setLargeUrl={setLargeUrl} />
+      {imgArr.length !== 0 && <Button loadMore={loadMore} />}
+      {isLoading && <Loader />}
+      <ToastContainer autoClose={3000} />
+      {showModal && <Modal onClose={toggleShowModal} largeImage={largeImage} />}
+    </div>
+  );
+};
