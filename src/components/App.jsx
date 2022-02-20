@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Loader from './Loader/Loader';
 import Searchbar from './Searchbar/Searchbar';
 import PixabayApi from 'API/pixabayApi';
@@ -15,6 +15,11 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState('');
+  const [showButtonLoad, setShowButtonLoad] = useState(false);
+
+  useEffect(() => {
+    setShowButtonLoad(false);
+  }, []);
 
   const toggleShowModal = () => {
     setShowModal(!showModal);
@@ -28,10 +33,12 @@ export const App = () => {
   const loadMore = () => {
     pixabayApi.incrementPage();
     setIsLoading(true);
-    pixabayApi.getImagesFromApiByName().then(hits => {
-      setImgArr([...imgArr, ...hits]);
-      setIsLoading(false);
-    });
+    pixabayApi
+      .getImagesFromApiByName()
+      .then(hits => {
+        setImgArr([...imgArr, ...hits]);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const onInputFormSubmit = query => {
@@ -41,18 +48,21 @@ export const App = () => {
     }
     pixabayApi.query = query;
     setIsLoading(true);
-    pixabayApi.getImagesFromApiByName().then(hits => {
-      setImgArr([...hits]);
-      setIsLoading(false);
-    });
+    pixabayApi
+      .getImagesFromApiByName()
+      .then(hits => {
+        setImgArr([...hits]);
+        setShowButtonLoad(true);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <div className={styles.App}>
       <Searchbar onFormSubmit={onInputFormSubmit} />
       <ImageGallery imgArr={imgArr} setLargeUrl={setLargeUrl} />
-      {isLoading && <Button loadMore={loadMore} />}
-      {isLoading && <Loader />}
+      {showButtonLoad === true ? <Button loadMore={loadMore} /> : ''}
+      {isLoading === true && <Loader />}
       <ToastContainer autoClose={3000} />
       {showModal && <Modal onClose={toggleShowModal} largeImage={largeImage} />}
     </div>
