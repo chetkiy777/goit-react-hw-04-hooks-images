@@ -1,10 +1,10 @@
 import styles from './styles.module.css';
 import { ImSearch } from 'react-icons/im';
-import { setState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-export const Searchbar = ({ onFormSubmit }) => {
-  const [searchValue, setSearchValue] = setState('');
+const Searchbar = ({ onFormSubmit }) => {
+  const [searchValue, setSearchValue] = useState('');
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -26,7 +26,7 @@ export const Searchbar = ({ onFormSubmit }) => {
           placeholder="Search images and photos"
           name="query"
           value={searchValue}
-          onChange={e => setSearchValue(e)}
+          onChange={e => setSearchValue(e.currentTarget.value)}
         />
       </form>
     </header>
@@ -36,6 +36,8 @@ export const Searchbar = ({ onFormSubmit }) => {
 Searchbar.propTypes = {
   onFormSubmit: PropTypes.func,
 };
+
+export default Searchbar;
 
 // class Searchbar extends React.Component {
 //   state = {

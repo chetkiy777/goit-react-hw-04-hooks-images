@@ -16,10 +16,6 @@ export const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState('');
 
-  const toggleLoading = () => {
-    setIsLoading(!isLoading);
-  };
-
   const toggleShowModal = () => {
     setShowModal(!showModal);
   };
@@ -31,10 +27,10 @@ export const App = () => {
 
   const loadMore = () => {
     pixabayApi.incrementPage();
-    toggleLoading();
+    setIsLoading(true);
     pixabayApi.getImagesFromApiByName().then(hits => {
       setImgArr([...imgArr, ...hits]);
-      toggleLoading();
+      setIsLoading(false);
     });
   };
 
@@ -44,10 +40,10 @@ export const App = () => {
       return;
     }
     pixabayApi.query = query;
-    toggleLoading();
+    setIsLoading(true);
     pixabayApi.getImagesFromApiByName().then(hits => {
       setImgArr([...hits]);
-      toggleLoading();
+      setIsLoading(false);
     });
   };
 
@@ -55,7 +51,7 @@ export const App = () => {
     <div className={styles.App}>
       <Searchbar onFormSubmit={onInputFormSubmit} />
       <ImageGallery imgArr={imgArr} setLargeUrl={setLargeUrl} />
-      {imgArr.length !== 0 && <Button loadMore={loadMore} />}
+      {isLoading && <Button loadMore={loadMore} />}
       {isLoading && <Loader />}
       <ToastContainer autoClose={3000} />
       {showModal && <Modal onClose={toggleShowModal} largeImage={largeImage} />}
