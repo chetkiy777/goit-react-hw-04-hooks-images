@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Container } from './App.styled';
 import Loader from './Loader/Loader';
 import Searchbar from './Searchbar/Searchbar';
 import PixabayApi from 'API/pixabayApi';
@@ -7,7 +8,6 @@ import Button from './Button/Button';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from './Modal/Modal';
-import styles from './styles.module.css';
 const pixabayApi = new PixabayApi();
 
 export const App = () => {
@@ -47,6 +47,7 @@ export const App = () => {
       return;
     }
     pixabayApi.query = query;
+    pixabayApi.resetPage();
     setIsLoading(true);
     pixabayApi
       .getImagesFromApiByName()
@@ -58,13 +59,13 @@ export const App = () => {
   };
 
   return (
-    <div className={styles.App}>
+    <Container>
       <Searchbar onFormSubmit={onInputFormSubmit} />
       <ImageGallery imgArr={imgArr} setLargeUrl={setLargeUrl} />
       {showButtonLoad === true ? <Button loadMore={loadMore} /> : ''}
       {isLoading === true && <Loader />}
       <ToastContainer autoClose={3000} />
       {showModal && <Modal onClose={toggleShowModal} largeImage={largeImage} />}
-    </div>
+    </Container>
   );
 };
