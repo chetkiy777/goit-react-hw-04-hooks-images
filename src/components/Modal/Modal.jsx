@@ -1,21 +1,25 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import styles from './styles.module.css';
 import { createPortal } from 'react-dom';
 
 const modalRoot = document.querySelector('#modal-root');
 
 const Modal = ({ onClose, largeImage }) => {
-  useEffect(() => {
-    window.addEventListener('keydown', handleClose);
-  }, [largeImage]);
-
-  const handleClose = e => {
+  const handleClose = useCallback((e) => {
     if (e.code === 'Escape') {
       onClose();
     }
-    window.removeEventListener('keydown', handleClose);
-  };
+  },[onClose])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleClose)
+
+    return () => {
+      window.removeEventListener('keydown', handleClose);
+    }
+  }, [largeImage, handleClose]);
+
 
   return createPortal(
     <div className={styles.Overlay}>
