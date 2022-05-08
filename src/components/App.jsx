@@ -41,11 +41,7 @@ export const App = () => {
       .finally(() => setIsLoading(false));
   };
 
-  const onInputFormSubmit = query => {
-    if (query.trim() === '') {
-      toast.error('введите значения для поиска');
-      return;
-    }
+  const newFindRequest = query => {
     pixabayApi.query = query;
     pixabayApi.resetPage();
     setIsLoading(true);
@@ -56,6 +52,15 @@ export const App = () => {
         setShowButtonLoad(true);
       })
       .finally(() => setIsLoading(false));
+  }
+
+  const onInputFormSubmit = query => {
+    if (query.trim() === '') {
+      toast.error('введите значения для поиска');
+      return;
+    }
+
+    newFindRequest(query);
   };
 
   return (
